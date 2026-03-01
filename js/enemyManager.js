@@ -10,8 +10,8 @@ export function createEnemySystem(app) {
         enemy.x = x;
         enemy.y = y;
 
-        // Randomize scale for variety
-        enemy.scale.set(0.3 + Math.random() * 0.2); // Larger robo asset base scale
+        // Randomize scale for variety (Smaller than character)
+        enemy.scale.set(0.08 + Math.random() * 0.04);
 
         // Simple vibration animation for enemies
         app.ticker.add(function wobble() {

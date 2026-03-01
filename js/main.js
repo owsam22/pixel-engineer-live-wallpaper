@@ -1,6 +1,5 @@
 import { Engineer } from './engineer.js';
 import { createEnemySystem } from './enemyManager.js';
-import { MissionLog } from './missionLog.js';
 import { SceneManager } from './sceneManager.js';
 
 export const app = new PIXI.Application({
@@ -21,8 +20,7 @@ window.addEventListener("mousemove", (e) => {
 
 const engineer = new Engineer(app, mousePos);
 const enemySystem = createEnemySystem(app);
-const missionLog = new MissionLog(app);
-const sceneManager = new SceneManager(app, engineer, enemySystem, missionLog);
+const sceneManager = new SceneManager(app, engineer, enemySystem);
 
 window.addEventListener("dblclick", (e) => {
     enemySystem.create(e.clientX, e.clientY);
