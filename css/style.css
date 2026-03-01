@@ -1,5 +1,24 @@
 body {
     margin: 0;
+    padding: 0;
     overflow: hidden;
-    background: #0f0f1a;
+    background-image: url('../assets/background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+canvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    /* Let clicks pass through if needed, but PIXI needs them for interactions */
+}
+
+/* Ensure PIXI canvas still gets mouse events for the Engineer's interactions */
+#pixi-canvas {
+    pointer-events: auto;
 }

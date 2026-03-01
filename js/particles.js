@@ -3,8 +3,8 @@ export function sparkEffect(app, x, y) {
     for (let i = 0; i < 10; i++) {
 
         const p = new PIXI.Graphics();
-        p.beginFill(0xffff00);
-        p.drawRect(0, 0, 3, 3);
+        p.beginFill(0x3498db); // Bright blue particle
+        p.drawCircle(0, 0, 3);
         p.endFill();
 
         p.x = x;

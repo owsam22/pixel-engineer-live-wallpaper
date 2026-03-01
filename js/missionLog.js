@@ -5,16 +5,17 @@ export class MissionLog {
         this.app.stage.addChild(this.container);
 
         this.bg = new PIXI.Graphics();
-        this.bg.beginFill(0x000000, 0.7);
+        this.bg.beginFill(0xffffff, 0.8);
         this.bg.drawRect(0, 0, window.innerWidth, 60);
         this.bg.endFill();
         this.bg.y = window.innerHeight - 60;
         this.container.addChild(this.bg);
 
         const style = new PIXI.TextStyle({
-            fontFamily: 'Courier New',
-            fontSize: 18,
-            fill: '#00ff00',
+            fontFamily: 'Verdana',
+            fontSize: 16,
+            fontWeight: 'bold',
+            fill: '#2c3e50',
             wordWrap: true,
             wordWrapWidth: window.innerWidth - 40
         });

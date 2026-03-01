@@ -5,10 +5,11 @@ import { SceneManager } from './sceneManager.js';
 
 export const app = new PIXI.Application({
     resizeTo: window,
-    backgroundColor: 0x0f0f1a,
+    backgroundAlpha: 0, // Transparent canvas to show CSS background
     antialias: true
 });
 
+app.view.id = 'pixi-canvas';
 document.body.appendChild(app.view);
 
 let mousePos = { x: 0, y: 0 };

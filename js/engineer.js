@@ -8,28 +8,28 @@ export class Engineer {
         this.app = app;
         this.mousePos = mousePos;
 
-        // Load the base texture for the sprite sheet
-        const baseTexture = PIXI.BaseTexture.from('assets/engineer.png');
-        const frameSize = 32; // Standard pixel art tile size, adjust if needed
+        // Define animations: Down, Up, Left, Right
+        const dirs = ['down', 'up', 'left', 'right'];
+        this.animations = {};
 
-        // Define animations: Down, Up, Left, Right (matching typical 4x4 sprite sheets)
-        this.animations = {
-            down: this.createAnimation(baseTexture, 0, 4, frameSize),
-            up: this.createAnimation(baseTexture, 1, 4, frameSize),
-            left: this.createAnimation(baseTexture, 2, 4, frameSize),
-            right: this.createAnimation(baseTexture, 3, 4, frameSize)
-        };
+        dirs.forEach(dir => {
+            const textures = [];
+            for (let i = 0; i < 4; i++) {
+                textures.push(PIXI.Texture.from(`assets/frames/${dir}_${i}.png`));
+            }
+            this.animations[dir] = new PIXI.AnimatedSprite(textures);
+        });
 
         this.currentDirection = 'down';
         this.sprite = this.animations[this.currentDirection];
-        this.sprite.anchor.set(0.5);
-        this.sprite.scale.set(4); // Scale up for pixel art feel
+        this.sprite.anchor.set(0.5, 0.5);
+        this.sprite.scale.set(0.25); // Scale down the 300x449 high-res frames
         this.sprite.x = window.innerWidth / 2;
         this.sprite.y = window.innerHeight - 200;
-        this.sprite.animationSpeed = 0.15;
+        this.sprite.animationSpeed = 0.12;
         this.sprite.play();
 
-        this.speed = 3;
+        this.speed = 4; // Slightly faster for the new world
         this.target = null;
         this.damageSpots = [];
 
@@ -84,15 +84,6 @@ export class Engineer {
         }, this);
     }
 
-    createAnimation(baseTexture, row, frames, size) {
-        const textures = [];
-        for (let i = 0; i < frames; i++) {
-            const rect = new PIXI.Rectangle(i * size, row * size, size, size);
-            textures.push(new PIXI.Texture(baseTexture, rect));
-        }
-        return new PIXI.AnimatedSprite(textures);
-    }
-
     setDirection(dir) {
         if (this.currentDirection === dir) return;
 
@@ -104,9 +95,9 @@ export class Engineer {
         this.sprite = this.animations[dir];
         this.sprite.x = prevX;
         this.sprite.y = prevY;
-        this.sprite.anchor.set(0.5);
-        this.sprite.scale.set(4);
-        this.sprite.animationSpeed = 0.15;
+        this.sprite.anchor.set(0.5, 0.5);
+        this.sprite.scale.set(0.25);
+        this.sprite.animationSpeed = 0.12;
         this.sprite.play();
         this.app.stage.addChild(this.sprite);
     }
