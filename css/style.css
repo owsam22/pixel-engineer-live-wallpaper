@@ -2,11 +2,14 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-image: url('../assets/background.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    /* CSS-based Ground & Sky background */
+    background: linear-gradient(to bottom,
+            #87ceeb 0%, #87ceeb 60%,
+            /* Sky */
+            #a8d08d 60%, #a8d08d 100%
+            /* Ground */
+        );
+    height: 100vh;
 }
 
 canvas {

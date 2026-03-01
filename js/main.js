@@ -1,5 +1,5 @@
 import { Engineer } from './engineer.js';
-import { createDamageSystem } from './damage.js';
+import { createEnemySystem } from './enemyManager.js';
 import { MissionLog } from './missionLog.js';
 import { SceneManager } from './sceneManager.js';
 
@@ -20,15 +20,15 @@ window.addEventListener("mousemove", (e) => {
 });
 
 const engineer = new Engineer(app, mousePos);
-const damageSystem = createDamageSystem(app);
+const enemySystem = createEnemySystem(app);
 const missionLog = new MissionLog(app);
-const sceneManager = new SceneManager(app, engineer, damageSystem, missionLog);
+const sceneManager = new SceneManager(app, engineer, enemySystem, missionLog);
 
 window.addEventListener("dblclick", (e) => {
-    damageSystem.create(e.clientX, e.clientY);
+    enemySystem.create(e.clientX, e.clientY);
 });
 
 app.ticker.add((delta) => {
-    engineer.update(damageSystem.getDamage());
+    engineer.update(enemySystem.getEnemies());
     sceneManager.update(delta);
 });

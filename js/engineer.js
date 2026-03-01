@@ -31,7 +31,7 @@ export class Engineer {
 
         this.speed = 4; // Slightly faster for the new world
         this.target = null;
-        this.damageSpots = [];
+        this.enemies = [];
 
         this.app.stage.addChild(this.sprite);
 
@@ -39,20 +39,20 @@ export class Engineer {
             idle: {
                 enter: () => { },
                 update: () => {
-                    if (this.damageSpots.length > 0) {
-                        this.stateMachine.transition("moveToRepair");
+                    if (this.enemies.length > 0) {
+                        this.stateMachine.transition("moveToCombat");
                     } else {
                         this.patrol();
                     }
                 }
             },
 
-            moveToRepair: {
+            moveToCombat: {
                 enter: () => {
-                    this.target = this.damageSpots[0];
+                    this.target = this.enemies[0];
                 },
                 update: () => {
-                    if (!this.target) {
+                    if (!this.target || !this.enemies.includes(this.target)) {
                         this.stateMachine.transition("idle");
                         return;
                     }
@@ -61,20 +61,23 @@ export class Engineer {
                     const dy = this.target.y - this.sprite.y;
                     const dist = Math.hypot(dx, dy);
 
-                    if (dist > 5) {
+                    if (dist > 10) {
                         this.sprite.x += (dx / dist) * this.speed;
                         this.sprite.y += (dy / dist) * this.speed;
                     } else {
-                        this.stateMachine.transition("repair");
+                        this.stateMachine.transition("attack");
                     }
                 }
             },
 
-            repair: {
+            attack: {
                 enter: () => {
-                    sparkEffect(this.app, this.sprite.x, this.sprite.y);
+                    sparkEffect(this.app, this.target.x, this.target.y);
                     this.app.stage.removeChild(this.target);
-                    this.damageSpots.shift();
+                    const index = this.enemies.indexOf(this.target);
+                    if (index > -1) {
+                        this.enemies.splice(index, 1);
+                    }
                 },
                 update: () => {
                     this.target = null;
@@ -102,8 +105,8 @@ export class Engineer {
         this.app.stage.addChild(this.sprite);
     }
 
-    update(damageSpots) {
-        this.damageSpots = damageSpots;
+    update(enemies) {
+        this.enemies = enemies;
 
         const prevPos = { x: this.sprite.x, y: this.sprite.y };
         this.stateMachine.update();
