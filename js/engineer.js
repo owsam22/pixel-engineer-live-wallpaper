@@ -8,15 +8,28 @@ export class Engineer {
         this.app = app;
         this.mousePos = mousePos;
 
-        this.texture = PIXI.Texture.from('assets/engineer.png');
+        // Load the base texture for the sprite sheet
+        const baseTexture = PIXI.BaseTexture.from('assets/engineer.png');
+        const frameSize = 32; // Standard pixel art tile size, adjust if needed
 
-        this.sprite = new PIXI.Sprite(this.texture);
+        // Define animations: Down, Up, Left, Right (matching typical 4x4 sprite sheets)
+        this.animations = {
+            down: this.createAnimation(baseTexture, 0, 4, frameSize),
+            up: this.createAnimation(baseTexture, 1, 4, frameSize),
+            left: this.createAnimation(baseTexture, 2, 4, frameSize),
+            right: this.createAnimation(baseTexture, 3, 4, frameSize)
+        };
+
+        this.currentDirection = 'down';
+        this.sprite = this.animations[this.currentDirection];
         this.sprite.anchor.set(0.5);
-        this.sprite.scale.set(0.4);
+        this.sprite.scale.set(4); // Scale up for pixel art feel
         this.sprite.x = window.innerWidth / 2;
         this.sprite.y = window.innerHeight - 200;
+        this.sprite.animationSpeed = 0.15;
+        this.sprite.play();
 
-        this.speed = 2;
+        this.speed = 3;
         this.target = null;
         this.damageSpots = [];
 
@@ -24,7 +37,7 @@ export class Engineer {
 
         this.stateMachine = new StateMachine("idle", {
             idle: {
-                enter: () => {},
+                enter: () => { },
                 update: () => {
                     if (this.damageSpots.length > 0) {
                         this.stateMachine.transition("moveToRepair");
@@ -71,13 +84,59 @@ export class Engineer {
         }, this);
     }
 
+    createAnimation(baseTexture, row, frames, size) {
+        const textures = [];
+        for (let i = 0; i < frames; i++) {
+            const rect = new PIXI.Rectangle(i * size, row * size, size, size);
+            textures.push(new PIXI.Texture(baseTexture, rect));
+        }
+        return new PIXI.AnimatedSprite(textures);
+    }
+
+    setDirection(dir) {
+        if (this.currentDirection === dir) return;
+
+        const prevX = this.sprite.x;
+        const prevY = this.sprite.y;
+
+        this.app.stage.removeChild(this.sprite);
+        this.currentDirection = dir;
+        this.sprite = this.animations[dir];
+        this.sprite.x = prevX;
+        this.sprite.y = prevY;
+        this.sprite.anchor.set(0.5);
+        this.sprite.scale.set(4);
+        this.sprite.animationSpeed = 0.15;
+        this.sprite.play();
+        this.app.stage.addChild(this.sprite);
+    }
+
     update(damageSpots) {
         this.damageSpots = damageSpots;
 
+        const prevPos = { x: this.sprite.x, y: this.sprite.y };
         this.stateMachine.update();
 
         this.handleCursorReaction();
         this.keepInBounds();
+
+        // Update animation based on movement
+        const dx = this.sprite.x - prevPos.x;
+        const dy = this.sprite.y - prevPos.y;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+            if (dx > 0.1) this.setDirection('right');
+            else if (dx < -0.1) this.setDirection('left');
+        } else {
+            if (dy > 0.1) this.setDirection('down');
+            else if (dy < -0.1) this.setDirection('up');
+        }
+
+        if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+            this.sprite.stop();
+        } else {
+            this.sprite.play();
+        }
     }
 
     patrol() {

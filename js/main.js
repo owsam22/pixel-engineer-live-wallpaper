@@ -1,5 +1,7 @@
 import { Engineer } from './engineer.js';
 import { createDamageSystem } from './damage.js';
+import { MissionLog } from './missionLog.js';
+import { SceneManager } from './sceneManager.js';
 
 export const app = new PIXI.Application({
     resizeTo: window,
@@ -18,11 +20,14 @@ window.addEventListener("mousemove", (e) => {
 
 const engineer = new Engineer(app, mousePos);
 const damageSystem = createDamageSystem(app);
+const missionLog = new MissionLog(app);
+const sceneManager = new SceneManager(app, engineer, damageSystem, missionLog);
 
 window.addEventListener("dblclick", (e) => {
     damageSystem.create(e.clientX, e.clientY);
 });
 
-app.ticker.add(() => {
+app.ticker.add((delta) => {
     engineer.update(damageSystem.getDamage());
+    sceneManager.update(delta);
 });
