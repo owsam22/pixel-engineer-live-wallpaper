@@ -37,22 +37,27 @@ export class Engineer {
 
         this.stateMachine = new StateMachine("idle", {
             idle: {
-                enter: () => { },
+                enter: () => {
+                    this.isFollowing = false;
+                },
                 update: () => {
                     if (this.enemies.length > 0) {
                         this.stateMachine.transition("moveToCombat");
                     } else {
-                        // Follow the cursor if it's not too close
                         const dx = this.mousePos.x - this.sprite.x;
                         const dy = this.mousePos.y - this.sprite.y;
                         const dist = Math.hypot(dx, dy);
 
-                        if (dist > 80) { // Keep some distance or follow
-                            this.sprite.x += (dx / dist) * this.speed * 0.5; // Follow slowly
+                        // Hysteresis for follow logic
+                        if (dist > 300) {
+                            this.isFollowing = true;
+                        } else if (dist < 100) {
+                            this.isFollowing = false;
+                        }
+
+                        if (this.isFollowing) {
+                            this.sprite.x += (dx / dist) * this.speed * 0.5;
                             this.sprite.y += (dy / dist) * this.speed * 0.5;
-                        } else if (dist < 40) {
-                            this.sprite.x -= (dx / dist) * 1.5; // Flee if very close
-                            this.sprite.y -= (dy / dist) * 1.5;
                         } else {
                             this.patrol();
                         }
@@ -74,7 +79,7 @@ export class Engineer {
                     const dy = this.target.y - this.sprite.y;
                     const dist = Math.hypot(dx, dy);
 
-                    if (dist > 10) {
+                    if (dist > 5) { // Small threshold to prevent snapping
                         this.sprite.x += (dx / dist) * this.speed;
                         this.sprite.y += (dy / dist) * this.speed;
                     } else {
@@ -139,7 +144,7 @@ export class Engineer {
             else if (dy < -0.1) this.setDirection('up');
         }
 
-        if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+        if (Math.abs(dx) < 0.2 && Math.abs(dy) < 0.2) {
             this.sprite.stop();
         } else {
             this.sprite.play();
@@ -163,7 +168,10 @@ export class Engineer {
     }
 
     keepInBounds() {
-        this.sprite.x = Math.max(30, Math.min(window.innerWidth - 30, this.sprite.x));
-        this.sprite.y = Math.max(30, Math.min(window.innerHeight - 30, this.sprite.y));
+        const padding = 60; // Sync with enemy spawn padding
+        const skyLimit = window.innerHeight * 0.10;
+
+        this.sprite.x = Math.max(padding, Math.min(window.innerWidth - padding, this.sprite.x));
+        this.sprite.y = Math.max(skyLimit, Math.min(window.innerHeight - padding, this.sprite.y));
     }
 }
