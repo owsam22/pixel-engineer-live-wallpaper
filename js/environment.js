@@ -331,19 +331,32 @@ export class Environment {
     updateSunMoon(time) {
         const width = this.app.screen ? this.app.screen.width : window.innerWidth;
         const height = this.app.screen ? this.app.screen.height : window.innerHeight;
-        const skyHeight = height * 0.15; // Increased to 15%
+        const skyHeight = height * 0.15;
 
-        // Sun: 5 AM (0.21) to 7:30 PM (0.81)
+        // Transitions: 5 AM (0.21) to 7:30 PM (0.81)
         const sunStart = 0.21;
         const sunEnd = 0.81;
+        const fadeDuration = 0.05; // 5% of day for fade in/out
 
-        if (time >= sunStart && time <= sunEnd) {
+        if (time >= sunStart - fadeDuration && time <= sunEnd + fadeDuration) {
             this.sun.visible = true;
-            this.skyContainer.setChildIndex(this.sun, this.skyContainer.children.length - 1);
+
+            // Calculate Alpha
+            let alpha = 1.0;
+            if (time < sunStart) {
+                alpha = (time - (sunStart - fadeDuration)) / fadeDuration;
+            } else if (time > sunEnd) {
+                alpha = 1.0 - (time - sunEnd) / fadeDuration;
+            }
+            this.sun.alpha = Math.max(0, Math.min(1, alpha));
+
             const progress = (time - sunStart) / (sunEnd - sunStart);
             this.sun.x = width * progress;
-            // Arc logic: use more vertical space
             this.sun.y = (skyHeight * 0.7) + Math.sin(progress * Math.PI) * -(skyHeight * 0.5);
+
+            // Add warm tint during dawn/dusk
+            const tintFactor = 1.0 - this.sun.alpha;
+            this.sun.tint = this.lerpColor(0xFFFFFF, 0xFFCC33, tintFactor);
         } else {
             this.sun.visible = false;
         }
@@ -352,9 +365,21 @@ export class Environment {
         const moonStart = 0.81;
         const moonEnd = 0.21;
 
-        if (time > moonStart || time < moonEnd) {
+        // Check if we are in moon time (handles midnight wrap-around)
+        const isMoonTime = (time > moonStart - fadeDuration || time < moonEnd + fadeDuration);
+
+        if (isMoonTime) {
             this.moon.visible = true;
-            this.skyContainer.setChildIndex(this.moon, this.skyContainer.children.length - 1);
+
+            let alpha = 1.0;
+            // Calculate Alpha for moon
+            if (time > moonStart - fadeDuration && time < moonStart) {
+                alpha = (time - (moonStart - fadeDuration)) / fadeDuration;
+            } else if (time > moonEnd && time < moonEnd + fadeDuration) {
+                alpha = 1.0 - (time - moonEnd) / fadeDuration;
+            }
+            this.moon.alpha = Math.max(0, Math.min(1, alpha));
+
             let progress;
             if (time > moonStart) {
                 progress = (time - moonStart) / (1 - moonStart + moonEnd);
