@@ -55,6 +55,37 @@ export class Environment {
         this.moon.scale.set(0.12);
         this.skyContainer.addChild(this.moon);
 
+        // Interaction for Time Display
+        this.sun.eventMode = 'static';
+        this.moon.eventMode = 'static';
+        this.sun.cursor = 'help';
+        this.moon.cursor = 'help';
+
+        this.timeDisplay = document.getElementById('time-display');
+        this.timeEl = this.timeDisplay.querySelector('.time');
+        this.dayEl = this.timeDisplay.querySelector('.day');
+
+        const onHover = () => {
+            this.timeDisplay.classList.add('visible');
+        };
+
+        const onOut = () => {
+            this.timeDisplay.classList.remove('visible');
+        };
+
+        const onMove = (e) => {
+            const pos = e.data.global;
+            this.timeDisplay.style.left = `${pos.x}px`;
+            this.timeDisplay.style.top = `${pos.y}px`;
+        };
+
+        this.sun.on('pointerover', onHover);
+        this.moon.on('pointerover', onHover);
+        this.sun.on('pointerout', onOut);
+        this.moon.on('pointerout', onOut);
+        this.sun.on('pointermove', onMove);
+        this.moon.on('pointermove', onMove);
+
         // Fix order: Overlay at bottom, celestial bodies on top
         this.skyContainer.setChildIndex(this.skyOverlay, 0);
         this.skyContainer.setChildIndex(this.sun, this.skyContainer.children.length - 1);
@@ -142,7 +173,22 @@ export class Environment {
             this.updateAtmosphere(time);
             this.updateSunMoon(time);
             this.updateStars(time, delta);
+            this.updateTimeDisplay();
         }
+    }
+
+    updateTimeDisplay() {
+        if (!this.timeDisplay.classList.contains('visible')) return;
+
+        const now = new Date();
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        const secs = String(now.getSeconds()).padStart(2, '0');
+
+        this.timeEl.textContent = `${hours}:${mins}:${secs}`;
+        this.dayEl.textContent = days[now.getDay()];
     }
 
     updateStars(time, delta) {
