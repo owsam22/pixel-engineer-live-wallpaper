@@ -310,20 +310,19 @@ export class Environment {
             this.skyOverlay.endFill();
         }
 
-        // 3. Horizon to Ground Blend (Feathered edge)
-        const blendZone = 80; // Larger blend zone
+        // 3. Horizon to Ground Blend (Moved to groundOverlay for occlusion)
+        this.groundOverlay.clear();
+        const blendZone = 80;
         for (let i = 0; i < blendZone; i += 4) {
             const ratio = i / blendZone;
             const blendedColor = this.lerpColor(currentState.horizon, currentState.ground, ratio);
-            // Blend alpha as well for smoother transition
-            this.skyOverlay.beginFill(blendedColor, currentState.alpha);
-            this.skyOverlay.drawRect(-overscan, skyHeight + i - (blendZone / 2), width + (overscan * 2), 5);
-            this.skyOverlay.endFill();
+            this.groundOverlay.beginFill(blendedColor, currentState.alpha);
+            this.groundOverlay.drawRect(-overscan, skyHeight + i - (blendZone / 2), width + (overscan * 2), 5);
+            this.groundOverlay.endFill();
         }
 
         // 4. Ground Base
-        this.groundOverlay.clear();
-        this.groundOverlay.beginFill(currentState.ground, currentState.alpha); // Opaque ground
+        this.groundOverlay.beginFill(currentState.ground, currentState.alpha);
         this.groundOverlay.drawRect(-overscan, skyHeight + (blendZone / 2), width + (overscan * 2), height - skyHeight + overscan);
         this.groundOverlay.endFill();
     }
@@ -336,7 +335,7 @@ export class Environment {
         // Transitions: 5 AM (0.21) to 7:30 PM (0.81)
         const sunStart = 0.21;
         const sunEnd = 0.81;
-        const fadeDuration = 0.05; // 5% of day for fade in/out
+        const fadeDuration = 0.05;
 
         if (time >= sunStart - fadeDuration && time <= sunEnd + fadeDuration) {
             this.sun.visible = true;
@@ -352,7 +351,8 @@ export class Environment {
 
             const progress = (time - sunStart) / (sunEnd - sunStart);
             this.sun.x = width * progress;
-            this.sun.y = (skyHeight * 0.7) + Math.sin(progress * Math.PI) * -(skyHeight * 0.5);
+            // Lowered at horizon (progress=0 or 1) so it sits behind ground haze
+            this.sun.y = (skyHeight * 0.9) + Math.sin(progress * Math.PI) * -(skyHeight * 0.7);
 
             // Add warm tint during dawn/dusk
             const tintFactor = 1.0 - this.sun.alpha;
@@ -365,14 +365,12 @@ export class Environment {
         const moonStart = 0.81;
         const moonEnd = 0.21;
 
-        // Check if we are in moon time (handles midnight wrap-around)
         const isMoonTime = (time > moonStart - fadeDuration || time < moonEnd + fadeDuration);
 
         if (isMoonTime) {
             this.moon.visible = true;
 
             let alpha = 1.0;
-            // Calculate Alpha for moon
             if (time > moonStart - fadeDuration && time < moonStart) {
                 alpha = (time - (moonStart - fadeDuration)) / fadeDuration;
             } else if (time > moonEnd && time < moonEnd + fadeDuration) {
@@ -387,7 +385,8 @@ export class Environment {
                 progress = (1 - moonStart + time) / (1 - moonStart + moonEnd);
             }
             this.moon.x = width * progress;
-            this.moon.y = (skyHeight * 0.7) + Math.sin(progress * Math.PI) * -(skyHeight * 0.5);
+            // Lowered at horizon
+            this.moon.y = (skyHeight * 0.9) + Math.sin(progress * Math.PI) * -(skyHeight * 0.7);
         } else {
             this.moon.visible = false;
         }
