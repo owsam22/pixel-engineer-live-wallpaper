@@ -25,20 +25,20 @@ export class Environment {
         // Atmosphere Color Config (Deep palettes for gradients)
         this.atmospheres = {
             night: {
-                skyTop: 0x010105, skyMid: 0x030310, horizon: 0x05051a,
-                ground: 0x050510, alpha: 0.8 // Increased alpha for darkness
+                skyTop: 0x02020a, skyMid: 0x050518, horizon: 0x0a1435,
+                ground: 0x0a1a0a, alpha: 1.0
             },
             dawn: {
                 skyTop: 0x2c3e50, skyMid: 0xff7e5f, horizon: 0xfeb47b,
-                ground: 0x4a7a3a, alpha: 0.4
+                ground: 0x4a7a3a, alpha: 1.0
             },
             noon: {
                 skyTop: 0x0072ff, skyMid: 0x00bfff, horizon: 0x87ceeb,
-                ground: 0x79b456, alpha: 0.0
+                ground: 0x79b456, alpha: 1.0
             },
             dusk: {
                 skyTop: 0x2c3e50, skyMid: 0x8e44ad, horizon: 0xc0392b,
-                ground: 0x2c3e50, alpha: 0.5
+                ground: 0x2c3e50, alpha: 1.0
             }
         };
     }
@@ -173,16 +173,16 @@ export class Environment {
         let currentState;
         let t = 0;
 
-        // Logical Transitions (IST-aligned)
-        // Night: 7:30 PM (0.81) - 5 AM (0.21)
-        // Dawn: 5 AM (0.21) - 7 AM (0.29)
-        // Day: 7 AM (0.29) - 5 PM (0.71)
-        // Dusk: 5 PM (0.71) - 7:30 PM (0.81)
+        // Logical Transitions (Expanded for Cinematic feel)
+        // Night: 8:24 PM (0.85) - 3:36 AM (0.15)
+        // Dawn: 3:36 AM (0.15) - 8:24 AM (0.35)
+        // Day: 8:24 AM (0.35) - 2:52 PM (0.62)
+        // Dusk: 2:52 PM (0.62) - 8:24 PM (0.85)
 
-        if (time < 0.21 || time > 0.81) { // Night
+        if (time < 0.15 || time > 0.85) { // Night
             currentState = this.atmospheres.night;
-        } else if (time >= 0.21 && time < 0.29) { // Dawn
-            t = (time - 0.21) / 0.08;
+        } else if (time >= 0.15 && time < 0.35) { // Dawn
+            t = (time - 0.15) / 0.20;
             currentState = {
                 skyTop: this.lerpColor(this.atmospheres.night.skyTop, this.atmospheres.dawn.skyTop, t),
                 skyMid: this.lerpColor(this.atmospheres.night.skyMid, this.atmospheres.dawn.skyMid, t),
@@ -190,8 +190,8 @@ export class Environment {
                 ground: this.lerpColor(this.atmospheres.night.ground, this.atmospheres.dawn.ground, t),
                 alpha: this.lerp(this.atmospheres.night.alpha, this.atmospheres.dawn.alpha, t)
             };
-        } else if (time >= 0.29 && time < 0.71) { // Noon
-            t = (time - 0.29) / 0.1;
+        } else if (time >= 0.35 && time < 0.62) { // Noon
+            t = (time - 0.35) / 0.1;
             if (t < 1) { // Morning transition
                 currentState = {
                     skyTop: this.lerpColor(this.atmospheres.dawn.skyTop, this.atmospheres.noon.skyTop, t),
@@ -203,8 +203,8 @@ export class Environment {
             } else {
                 currentState = this.atmospheres.noon;
             }
-        } else { // Dusk (0.71 to 0.81)
-            t = (time - 0.71) / 0.1;
+        } else { // Dusk (0.62 to 0.85)
+            t = (time - 0.62) / 0.23;
             currentState = {
                 skyTop: this.lerpColor(this.atmospheres.noon.skyTop, this.atmospheres.dusk.skyTop, t),
                 skyMid: this.lerpColor(this.atmospheres.noon.skyMid, this.atmospheres.dusk.skyMid, t),
@@ -222,11 +222,11 @@ export class Environment {
         this.skyOverlay.clear();
 
         // 1. Sky Top to Mid
-        for (let i = 0; i < middleSky; i += 5) {
-            const ratio = i / middleSky;
+        for (let i = -overscan; i < middleSky; i += 5) { // Start from overscan!
+            const ratio = (i + overscan) / (middleSky + overscan);
             const col = this.lerpColor(currentState.skyTop, currentState.skyMid, ratio);
             this.skyOverlay.beginFill(col, currentState.alpha);
-            this.skyOverlay.drawRect(-overscan, i - overscan, width + (overscan * 2), 6);
+            this.skyOverlay.drawRect(-overscan, i, width + (overscan * 2), 6);
             this.skyOverlay.endFill();
         }
 
@@ -241,20 +241,19 @@ export class Environment {
         }
 
         // 3. Horizon to Ground Blend (Feathered edge)
-        const blendZone = 60;
+        const blendZone = 80; // Larger blend zone
         for (let i = 0; i < blendZone; i += 4) {
             const ratio = i / blendZone;
             const blendedColor = this.lerpColor(currentState.horizon, currentState.ground, ratio);
-            const blendedAlpha = this.lerp(currentState.alpha, currentState.alpha * 0.4, ratio);
-
-            this.skyOverlay.beginFill(blendedColor, blendedAlpha);
+            // Blend alpha as well for smoother transition
+            this.skyOverlay.beginFill(blendedColor, currentState.alpha);
             this.skyOverlay.drawRect(-overscan, skyHeight + i - (blendZone / 2), width + (overscan * 2), 5);
             this.skyOverlay.endFill();
         }
 
         // 4. Ground Base
         this.groundOverlay.clear();
-        this.groundOverlay.beginFill(currentState.ground, currentState.alpha * 0.4);
+        this.groundOverlay.beginFill(currentState.ground, currentState.alpha); // Opaque ground
         this.groundOverlay.drawRect(-overscan, skyHeight + (blendZone / 2), width + (overscan * 2), height - skyHeight + overscan);
         this.groundOverlay.endFill();
     }
