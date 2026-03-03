@@ -69,20 +69,30 @@ export class Environment {
         const onHover = (e) => {
             const sprite = e.currentTarget;
             const pos = sprite.toGlobal(new PIXI.Point(0, 0));
-            const width = sprite.width * sprite.scale.x;
 
-            // Show on right if sprite is on left half, otherwise show on left
-            const offset = 80;
-            if (pos.x < window.innerWidth / 2) {
-                this.timeDisplay.style.left = `${pos.x + offset}px`;
-            } else {
-                this.timeDisplay.style.left = `${pos.x - offset}px`;
+            // Safety Margin from top of screen
+            const topMargin = 20;
+            const xOffset = 60;
+            const yOffset = (sprite.height / 2) + 15;
+
+            // Ensure Y is at least topMargin + half height of display
+            let targetY = pos.y + yOffset;
+            const displayHeight = 60; // Approximate
+            if (targetY < topMargin + displayHeight / 2) {
+                targetY = topMargin + displayHeight / 2;
             }
 
-            this.timeDisplay.style.top = `${pos.y}px`;
-            this.timeDisplay.style.transform = `translate(-50%, -50%)`; // Center on calculation point
+            if (pos.x < window.innerWidth / 2) {
+                this.timeDisplay.style.left = `${pos.x + xOffset}px`;
+                this.timeDisplay.style.transform = `translate(0, -50%)`;
+            } else {
+                this.timeDisplay.style.left = `${pos.x - xOffset}px`;
+                this.timeDisplay.style.transform = `translate(-100%, -50%)`;
+            }
+
+            this.timeDisplay.style.top = `${targetY}px`;
             this.timeDisplay.classList.add('visible');
-            this.updateTimeDisplay(); // Update immediately
+            this.updateTimeDisplay();
         };
 
         const onOut = () => {
