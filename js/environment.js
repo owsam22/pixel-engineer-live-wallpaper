@@ -64,27 +64,35 @@ export class Environment {
         this.timeDisplay = document.getElementById('time-display');
         this.timeEl = this.timeDisplay.querySelector('.time');
         this.dayEl = this.timeDisplay.querySelector('.day');
+        this.dateEl = this.timeDisplay.querySelector('.date');
 
-        const onHover = () => {
+        const onHover = (e) => {
+            const sprite = e.currentTarget;
+            const pos = sprite.toGlobal(new PIXI.Point(0, 0));
+            const width = sprite.width * sprite.scale.x;
+
+            // Show on right if sprite is on left half, otherwise show on left
+            const offset = 80;
+            if (pos.x < window.innerWidth / 2) {
+                this.timeDisplay.style.left = `${pos.x + offset}px`;
+            } else {
+                this.timeDisplay.style.left = `${pos.x - offset}px`;
+            }
+
+            this.timeDisplay.style.top = `${pos.y}px`;
+            this.timeDisplay.style.transform = `translate(-50%, -50%)`; // Center on calculation point
             this.timeDisplay.classList.add('visible');
+            this.updateTimeDisplay(); // Update immediately
         };
 
         const onOut = () => {
             this.timeDisplay.classList.remove('visible');
         };
 
-        const onMove = (e) => {
-            const pos = e.data.global;
-            this.timeDisplay.style.left = `${pos.x}px`;
-            this.timeDisplay.style.top = `${pos.y}px`;
-        };
-
         this.sun.on('pointerover', onHover);
         this.moon.on('pointerover', onHover);
         this.sun.on('pointerout', onOut);
         this.moon.on('pointerout', onOut);
-        this.sun.on('pointermove', onMove);
-        this.moon.on('pointermove', onMove);
 
         // Fix order: Overlay at bottom, celestial bodies on top
         this.skyContainer.setChildIndex(this.skyOverlay, 0);
@@ -182,13 +190,20 @@ export class Environment {
 
         const now = new Date();
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-        const hours = String(now.getHours()).padStart(2, '0');
-        const mins = String(now.getMinutes()).padStart(2, '0');
-        const secs = String(now.getSeconds()).padStart(2, '0');
+        // 12h Format
+        let hours = now.getHours();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // Handle 0 as 12
+        const hStr = String(hours).padStart(2, '0');
+        const mStr = String(now.getMinutes()).padStart(2, '0');
+        const sStr = String(now.getSeconds()).padStart(2, '0');
 
-        this.timeEl.textContent = `${hours}:${mins}:${secs}`;
+        this.timeEl.textContent = `${hStr}:${mStr}:${sStr} ${ampm}`;
         this.dayEl.textContent = days[now.getDay()];
+        this.dateEl.textContent = `${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
     }
 
     updateStars(time, delta) {
