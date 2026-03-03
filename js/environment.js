@@ -199,9 +199,8 @@ export class Environment {
         hours = hours ? hours : 12; // Handle 0 as 12
         const hStr = String(hours).padStart(2, '0');
         const mStr = String(now.getMinutes()).padStart(2, '0');
-        const sStr = String(now.getSeconds()).padStart(2, '0');
 
-        this.timeEl.textContent = `${hStr}:${mStr}:${sStr} ${ampm}`;
+        this.timeEl.textContent = `${hStr}:${mStr} ${ampm}`;
         this.dayEl.textContent = days[now.getDay()];
         this.dateEl.textContent = `${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
     }
