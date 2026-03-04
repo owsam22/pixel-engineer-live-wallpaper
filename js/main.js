@@ -27,11 +27,9 @@ window.addEventListener("mousemove", (e) => {
 });
 
 const environment = new Environment(app);
-const engineer = new Engineer(app, mousePos);
-// Explicitly re-add engineer to ensure he is above ground but below foreground
-app.stage.setChildIndex(engineer.sprite, app.stage.children.length - 2);
+const engineer = new Engineer(app, mousePos, environment.characterContainer);
 
-const enemySystem = createEnemySystem(app);
+const enemySystem = createEnemySystem(app, environment.characterContainer);
 const sceneManager = new SceneManager(app, engineer, enemySystem);
 
 window.addEventListener("dblclick", (e) => {

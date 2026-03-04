@@ -3,10 +3,11 @@ import { sparkEffect } from './particles.js';
 
 export class Engineer {
 
-    constructor(app, mousePos) {
+    constructor(app, mousePos, characterContainer) {
 
         this.app = app;
         this.mousePos = mousePos;
+        this.characterContainer = characterContainer;
 
         // Define animations: Down, Up, Left, Right
         const dirs = ['down', 'up', 'left', 'right'];
@@ -33,7 +34,7 @@ export class Engineer {
         this.target = null;
         this.enemies = [];
 
-        this.app.stage.addChild(this.sprite);
+        this.characterContainer.addChild(this.sprite);
 
         this.stateMachine = new StateMachine("idle", {
             idle: {
@@ -90,8 +91,8 @@ export class Engineer {
 
             attack: {
                 enter: () => {
-                    sparkEffect(this.app, this.target.x, this.target.y);
-                    this.app.stage.removeChild(this.target);
+                    sparkEffect(this.app, this.target.x, this.target.y, this.characterContainer);
+                    this.characterContainer.removeChild(this.target);
                     const index = this.enemies.indexOf(this.target);
                     if (index > -1) {
                         this.enemies.splice(index, 1);
@@ -111,7 +112,7 @@ export class Engineer {
         const prevX = this.sprite.x;
         const prevY = this.sprite.y;
 
-        this.app.stage.removeChild(this.sprite);
+        this.characterContainer.removeChild(this.sprite);
         this.currentDirection = dir;
         this.sprite = this.animations[dir];
         this.sprite.x = prevX;
@@ -120,7 +121,7 @@ export class Engineer {
         this.sprite.scale.set(0.25);
         this.sprite.animationSpeed = 0.12;
         this.sprite.play();
-        this.app.stage.addChild(this.sprite);
+        this.characterContainer.addChild(this.sprite);
     }
 
     update(enemies) {

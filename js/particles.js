@@ -1,4 +1,4 @@
-export function sparkEffect(app, x, y) {
+export function sparkEffect(app, x, y, container) {
 
     for (let i = 0; i < 10; i++) {
 
@@ -13,7 +13,8 @@ export function sparkEffect(app, x, y) {
         p.vy = (Math.random() - 0.5) * 4;
         p.life = 30;
 
-        app.stage.addChild(p);
+        const parentContainer = container || app.stage;
+        parentContainer.addChild(p);
 
         app.ticker.add(function update() {
             p.x += p.vx;
@@ -21,7 +22,7 @@ export function sparkEffect(app, x, y) {
             p.life--;
 
             if (p.life <= 0) {
-                app.stage.removeChild(p);
+                parentContainer.removeChild(p);
                 app.ticker.remove(update);
             }
         });

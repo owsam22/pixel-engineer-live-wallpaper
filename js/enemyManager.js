@@ -1,4 +1,4 @@
-export function createEnemySystem(app) {
+export function createEnemySystem(app, characterContainer) {
 
     let enemies = [];
 
@@ -29,7 +29,7 @@ export function createEnemySystem(app) {
             enemy.rotation = Math.sin(Date.now() * 0.02) * 0.1;
         });
 
-        app.stage.addChild(enemy);
+        characterContainer.addChild(enemy);
         enemies.push(enemy);
     }
 

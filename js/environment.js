@@ -3,10 +3,12 @@ export class Environment {
         this.app = app;
         this.skyContainer = new PIXI.Container();
         this.groundContainer = new PIXI.Container();
+        this.characterContainer = new PIXI.Container();
         this.foregroundContainer = new PIXI.Container();
 
         this.app.stage.addChild(this.skyContainer);
         this.app.stage.addChild(this.groundContainer);
+        this.app.stage.addChild(this.characterContainer);
         this.app.stage.addChild(this.foregroundContainer);
 
         // Atmosphere Layers (Subtle overlays + Stars)
