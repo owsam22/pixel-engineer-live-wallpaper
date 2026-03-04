@@ -152,7 +152,7 @@ export class Environment {
 
     initGround() {
         for (let i = 0; i < 15; i++) {
-            const grass = PIXI.Sprite.from('assets/grass.png');
+            const grass = PIXI.Sprite.from('assets/grass1.png');
             grass.anchor.set(0.5, 1);
             grass.x = Math.random() * window.innerWidth;
             grass.y = window.innerHeight * 0.15 + Math.random() * (window.innerHeight * 0.85);
