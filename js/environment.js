@@ -151,28 +151,54 @@ export class Environment {
     }
 
     initGround() {
-        for (let i = 0; i < 15; i++) {
-            const grass = PIXI.Sprite.from('assets/grass1.png');
-            grass.anchor.set(0.5, 1);
-            grass.x = Math.random() * window.innerWidth;
-            grass.y = window.innerHeight * 0.15 + Math.random() * (window.innerHeight * 0.85);
-            grass.scale.set(0.04 + Math.random() * 0.06);
-            grass.alpha = 0.4 + Math.random() * 0.3;
-            this.groundContainer.addChild(grass);
+        const grassAssets = ['assets/grass1.png', 'assets/grass2.png', 'assets/grass3.png'];
+        const stoneAssets = ['assets/stone1.png'];
+
+        for (let i = 0; i < 20; i++) {
+            const isStone = Math.random() < 0.1;
+            const asset = isStone ? stoneAssets[0] : grassAssets[Math.floor(Math.random() * grassAssets.length)];
+            const sprite = PIXI.Sprite.from(asset);
+
+            sprite.anchor.set(0.5, 1);
+            sprite.x = Math.random() * window.innerWidth;
+            sprite.y = window.innerHeight * 0.15 + Math.random() * (window.innerHeight * 0.85);
+
+            // Adjust scales based on asset type
+            const baseScale = isStone ? 0.05 : 0.04;
+            sprite.scale.set(baseScale + Math.random() * 0.05);
+            sprite.alpha = 0.3 + Math.random() * 0.4;
+
+            // Subtle tint for variation
+            sprite.tint = isStone ? 0xDDDDDD : 0xEEFFEE;
+
+            this.groundContainer.addChild(sprite);
         }
     }
 
     initForeground() {
+        const grassAssets = ['assets/grass1.png', 'assets/grass2.png', 'assets/grass3.png'];
+        const stoneAssets = ['assets/stone1.png'];
         const spacing = 150;
+
         for (let x = 0; x < window.innerWidth + spacing; x += spacing) {
-            if (Math.random() > 0.4) {
-                const grass = PIXI.Sprite.from('assets/grass.png');
-                grass.anchor.set(0.5, 1);
-                grass.x = x + (Math.random() - 0.5) * 80;
-                grass.y = window.innerHeight + 10;
-                grass.scale.set(0.3 + Math.random() * 0.15);
-                grass.alpha = 0.9;
-                this.foregroundContainer.addChild(grass);
+            if (Math.random() < 0.6) {
+                const isStone = Math.random() < 0.15;
+                const asset = isStone ? stoneAssets[0] : grassAssets[Math.floor(Math.random() * grassAssets.length)];
+                const sprite = PIXI.Sprite.from(asset);
+
+                sprite.anchor.set(0.5, 1);
+                sprite.x = x + (Math.random() - 0.5) * 100;
+                // Positioned slightly off-screen to hide the base
+                sprite.y = window.innerHeight + 15;
+
+                const baseScale = isStone ? 0.25 : 0.3;
+                sprite.scale.set(baseScale + Math.random() * 0.2);
+                sprite.alpha = 0.85 + Math.random() * 0.15;
+
+                // Slight rotation for natural feel
+                sprite.rotation = (Math.random() - 0.5) * 0.15;
+
+                this.foregroundContainer.addChild(sprite);
             }
         }
     }
