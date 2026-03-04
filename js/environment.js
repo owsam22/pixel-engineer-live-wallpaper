@@ -154,8 +154,9 @@ export class Environment {
         const grassAssets = ['assets/grass1.png', 'assets/grass2.png', 'assets/grass3.png'];
         const stoneAssets = ['assets/stone1.png'];
 
-        for (let i = 0; i < 20; i++) {
-            const isStone = Math.random() < 0.1;
+        // Increased count (45) for a denser, richer field
+        for (let i = 0; i < 45; i++) {
+            const isStone = Math.random() < 0.12;
             const asset = isStone ? stoneAssets[0] : grassAssets[Math.floor(Math.random() * grassAssets.length)];
             const sprite = PIXI.Sprite.from(asset);
 
@@ -163,10 +164,10 @@ export class Environment {
             sprite.x = Math.random() * window.innerWidth;
             sprite.y = window.innerHeight * 0.15 + Math.random() * (window.innerHeight * 0.85);
 
-            // Adjust scales based on asset type
-            const baseScale = isStone ? 0.05 : 0.04;
-            sprite.scale.set(baseScale + Math.random() * 0.05);
-            sprite.alpha = 0.3 + Math.random() * 0.4;
+            // Increased scales for more prominent ground elements
+            const baseScale = isStone ? 0.08 : 0.06;
+            sprite.scale.set(baseScale + Math.random() * 0.06);
+            sprite.alpha = 0.35 + Math.random() * 0.35;
 
             // Subtle tint for variation
             sprite.tint = isStone ? 0xDDDDDD : 0xEEFFEE;
@@ -181,15 +182,16 @@ export class Environment {
         const spacing = 150;
 
         for (let x = 0; x < window.innerWidth + spacing; x += spacing) {
-            if (Math.random() < 0.6) {
+            // Reduced probability (0.35) for a sparser, cleaner bottom edge
+            if (Math.random() < 0.35) {
                 const isStone = Math.random() < 0.15;
                 const asset = isStone ? stoneAssets[0] : grassAssets[Math.floor(Math.random() * grassAssets.length)];
                 const sprite = PIXI.Sprite.from(asset);
 
                 sprite.anchor.set(0.5, 1);
                 sprite.x = x + (Math.random() - 0.5) * 100;
-                // Positioned slightly off-screen to hide the base
-                sprite.y = window.innerHeight + 15;
+                // Deepened clipping to be "more than half hidden"
+                sprite.y = window.innerHeight + 75;
 
                 const baseScale = isStone ? 0.25 : 0.3;
                 sprite.scale.set(baseScale + Math.random() * 0.2);
