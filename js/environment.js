@@ -278,9 +278,9 @@ export class Environment {
         // Day: 8:24 AM (0.35) - 2:52 PM (0.62)
         // Dusk: 2:52 PM (0.62) - 8:24 PM (0.85)
 
-        if (time < 0.15 || time > 0.85) { // Night
+        if (time < 0.15 || time >= 0.95) { // Night
             currentState = this.atmospheres.night;
-        } else if (time >= 0.15 && time < 0.35) { // Dawn
+        } else if (time >= 0.15 && time < 0.35) { // Night to Dawn
             t = (time - 0.15) / 0.20;
             currentState = {
                 skyTop: this.lerpColor(this.atmospheres.night.skyTop, this.atmospheres.dawn.skyTop, t),
@@ -289,27 +289,34 @@ export class Environment {
                 ground: this.lerpColor(this.atmospheres.night.ground, this.atmospheres.dawn.ground, t),
                 alpha: this.lerp(this.atmospheres.night.alpha, this.atmospheres.dawn.alpha, t)
             };
-        } else if (time >= 0.35 && time < 0.62) { // Noon
-            t = (time - 0.35) / 0.1;
-            if (t < 1) { // Morning transition
-                currentState = {
-                    skyTop: this.lerpColor(this.atmospheres.dawn.skyTop, this.atmospheres.noon.skyTop, t),
-                    skyMid: this.lerpColor(this.atmospheres.dawn.skyMid, this.atmospheres.noon.skyMid, t),
-                    horizon: this.lerpColor(this.atmospheres.dawn.horizon, this.atmospheres.noon.horizon, t),
-                    ground: this.lerpColor(this.atmospheres.dawn.ground, this.atmospheres.noon.ground, t),
-                    alpha: this.lerp(this.atmospheres.dawn.alpha, this.atmospheres.noon.alpha, t)
-                };
-            } else {
-                currentState = this.atmospheres.noon;
-            }
-        } else { // Dusk (0.62 to 0.85)
-            t = (time - 0.62) / 0.23;
+        } else if (time >= 0.35 && time < 0.50) { // Dawn to Noon (Morning)
+            t = (time - 0.35) / 0.15;
+            currentState = {
+                skyTop: this.lerpColor(this.atmospheres.dawn.skyTop, this.atmospheres.noon.skyTop, t),
+                skyMid: this.lerpColor(this.atmospheres.dawn.skyMid, this.atmospheres.noon.skyMid, t),
+                horizon: this.lerpColor(this.atmospheres.dawn.horizon, this.atmospheres.noon.horizon, t),
+                ground: this.lerpColor(this.atmospheres.dawn.ground, this.atmospheres.noon.ground, t),
+                alpha: this.lerp(this.atmospheres.dawn.alpha, this.atmospheres.noon.alpha, t)
+            };
+        } else if (time >= 0.50 && time < 0.65) { // Pure Noon
+            currentState = this.atmospheres.noon;
+        } else if (time >= 0.65 && time < 0.85) { // Noon to Dusk
+            t = (time - 0.65) / 0.20;
             currentState = {
                 skyTop: this.lerpColor(this.atmospheres.noon.skyTop, this.atmospheres.dusk.skyTop, t),
                 skyMid: this.lerpColor(this.atmospheres.noon.skyMid, this.atmospheres.dusk.skyMid, t),
                 horizon: this.lerpColor(this.atmospheres.noon.horizon, this.atmospheres.dusk.horizon, t),
                 ground: this.lerpColor(this.atmospheres.noon.ground, this.atmospheres.dusk.ground, t),
                 alpha: this.lerp(this.atmospheres.noon.alpha, this.atmospheres.dusk.alpha, t)
+            };
+        } else { // Dusk to Night (0.85 to 0.95)
+            t = (time - 0.85) / 0.10;
+            currentState = {
+                skyTop: this.lerpColor(this.atmospheres.dusk.skyTop, this.atmospheres.night.skyTop, t),
+                skyMid: this.lerpColor(this.atmospheres.dusk.skyMid, this.atmospheres.night.skyMid, t),
+                horizon: this.lerpColor(this.atmospheres.dusk.horizon, this.atmospheres.night.horizon, t),
+                ground: this.lerpColor(this.atmospheres.dusk.ground, this.atmospheres.night.ground, t),
+                alpha: this.lerp(this.atmospheres.dusk.alpha, this.atmospheres.night.alpha, t)
             };
         }
 
