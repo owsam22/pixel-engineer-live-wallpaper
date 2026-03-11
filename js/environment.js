@@ -369,23 +369,32 @@ export class Environment {
         if (time >= sunStart - fadeDuration && time <= sunEnd + fadeDuration) {
             this.sun.visible = true;
 
-            // Calculate Alpha
-            let alpha = 1.0;
-            if (time < sunStart) {
-                alpha = (time - (sunStart - fadeDuration)) / fadeDuration;
-            } else if (time > sunEnd) {
-                alpha = 1.0 - (time - sunEnd) / fadeDuration;
-            }
-            this.sun.alpha = Math.max(0, Math.min(1, alpha));
-
             const progress = (time - sunStart) / (sunEnd - sunStart);
             this.sun.x = width * progress;
             // Lowered at horizon (progress=0 or 1) so it sits behind ground haze
             this.sun.y = (skyHeight * 0.9) + Math.sin(progress * Math.PI) * -(skyHeight * 0.7);
 
-            // Add warm tint during dawn/dusk
-            const tintFactor = 1.0 - this.sun.alpha;
-            this.sun.tint = this.lerpColor(0xFFFFFF, 0xFFCC33, tintFactor);
+            // 1. Dynamic Brightness: Peaks at noon (progress = 0.5)
+            // We use a sine wave squared to make the peak feel more dramatic, but keep it visible at edges
+            const brightnessFactor = 0.4 + Math.pow(Math.sin(progress * Math.PI), 1.5) * 0.6;
+
+            // Calculate Base Alpha for fading in/out at extremes
+            let baseAlpha = 1.0;
+            if (time < sunStart) {
+                baseAlpha = (time - (sunStart - fadeDuration)) / fadeDuration;
+            } else if (time > sunEnd) {
+                baseAlpha = 1.0 - (time - sunEnd) / fadeDuration;
+            }
+
+            this.sun.alpha = Math.max(0, Math.min(1, baseAlpha * brightnessFactor));
+
+            // 2. Dynamic Color: Deep red/orange at horizon, bright yellow/white at noon
+            const midColor = 0xFFFFFF; // White/High Noon
+            const dawnDuskColor = 0xFF4422; // Deep Red
+
+            // colorProgress goes from 0 at dawn/dusk to 1 at noon
+            const colorProgress = Math.sin(progress * Math.PI);
+            this.sun.tint = this.lerpColor(dawnDuskColor, midColor, colorProgress);
         } else {
             this.sun.visible = false;
         }
