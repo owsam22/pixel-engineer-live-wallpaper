@@ -142,7 +142,7 @@ export class Environment {
         cloud.x = x;
         // Varied height within top 40px
         cloud.y = 15 + Math.random() * 35;
-        cloud.alpha = 0.15 + Math.random() * 0.15;
+        cloud.alpha = 0.25 + Math.random() * 0.25; // Increased for better sun occlusion visibility
         // Varied scale for depth effect
         const scale = 0.07 + Math.random() * 0.15;
         cloud.scale.set(scale);
@@ -385,8 +385,7 @@ export class Environment {
             } else if (time > sunEnd) {
                 baseAlpha = 1.0 - (time - sunEnd) / fadeDuration;
             }
-
-            this.sun.alpha = Math.max(0, Math.min(1, baseAlpha * brightnessFactor));
+            this.sun.alpha = Math.max(0, Math.min(1, baseAlpha)); // Opaque sun (just fades at extremes)
 
             // 2. Dynamic Color: Deep red/orange at horizon, bright yellow/white at noon
             const midColor = 0xFFFFFF; // White/High Noon

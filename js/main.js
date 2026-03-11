@@ -12,7 +12,7 @@ export const app = new PIXI.Application({
 // --- USER CONFIG ---
 export const USER_CONFIG = {
     timezoneOffset: 5.5, // IST (India)
-    cycleSpeed: 1      // 1.0 = Real-time. Try 20000 to see the whole day in seconds.
+    cycleSpeed: 1    // 1.0 = Real-time. Try 20000 to see the whole day in seconds.
 };
 // --------------------
 
