@@ -30,7 +30,7 @@ export class Engineer {
         this.sprite.animationSpeed = 0.12;
         this.sprite.play();
 
-        this.speed = 4; // Slightly faster for the new world
+        this.speed = 7; // Slightly faster for the new world
         this.target = null;
         this.enemies = [];
 
