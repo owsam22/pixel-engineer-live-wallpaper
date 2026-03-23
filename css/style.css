@@ -37,7 +37,7 @@ canvas {
 #watermark {
     position: fixed;
     bottom: 7%;
-    right: 20px;
+    right: 3%;
     padding: 8px 14px;
     display: flex;
     align-items: center;
@@ -57,8 +57,8 @@ canvas {
 #watermark .dev-tag {
     background: rgba(255, 255, 255, 0.1);
     color: rgba(0, 0, 0, 0.9);
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: 1px 3px;
+    border-radius: 3px;
     font-size: 8px;
     font-weight: 700;
     letter-spacing: 0.5px;
