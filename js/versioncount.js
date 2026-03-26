@@ -68,12 +68,10 @@ async function loadVersion() {
 
 function displayVersion(container, commitCount) {
   const version = calculateVersion(commitCount);
-
-  const versionDiv = document.createElement("div");
-  versionDiv.classList.add("version-text");
-  versionDiv.textContent = `V ${version}`;
-
-  container.appendChild(versionDiv);
+  const versionElement = document.getElementById("wm-version-number");
+  if (versionElement) {
+    versionElement.textContent = `V ${version}`;
+  }
 }
 
 loadVersion();
