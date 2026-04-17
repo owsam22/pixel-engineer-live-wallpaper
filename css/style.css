@@ -37,7 +37,7 @@ canvas {
 #watermark {
     position: fixed;
     bottom: 5%;
-    right: 20%;
+    right: 2%;
     z-index: 9999;
 }
 /*new watermark*/
